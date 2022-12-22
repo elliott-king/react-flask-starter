@@ -79,7 +79,8 @@ services:
       shipyard.job: true
     image: busybox
     command: 'echo "Hello and Goodbye World"'
-    depends_on: postgres
+    depends_on:
+      - postgres
 
   hello_cron:
     labels:
