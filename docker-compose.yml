@@ -93,7 +93,6 @@ services:
       shipyard.job: true
       shipyard.job.schedule: '*/2 * * * *'
       shipyard.job.restartPolicy: Never
-      shipyard.job.backoffLimit: 2
       shipyard.job.activeDeadlineSeconds: 60
       shipyard.job.successfulJobsHistoryLimit: 5
       shipyard.job.failedJobsHistoryLimit: 3
