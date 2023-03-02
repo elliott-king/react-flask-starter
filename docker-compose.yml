@@ -77,6 +77,12 @@ services:
   hello:
     labels:
       shipyard.job: true
+      shipyard.job.restartPolicy: Never
+      shipyard.job.backoffLimit: 2
+      shipyard.job.activeDeadlineSeconds: 60
+      shipyard.job.successfulJobsHistoryLimit: 5
+      shipyard.job.failedJobsHistoryLimit: 3
+      shipyard.job.concurrencyPolicy: Forbid
     image: busybox
     command: 'echo "Hello and Goodbye World"'
     depends_on:
@@ -86,6 +92,12 @@ services:
     labels:
       shipyard.job: true
       shipyard.job.schedule: '*/2 * * * *'
+      shipyard.job.restartPolicy: Never
+      shipyard.job.backoffLimit: 2
+      shipyard.job.activeDeadlineSeconds: 60
+      shipyard.job.successfulJobsHistoryLimit: 5
+      shipyard.job.failedJobsHistoryLimit: 3
+      shipyard.job.concurrencyPolicy: Forbid
     image: busybox
     command: 'echo "Hello World"'
 
