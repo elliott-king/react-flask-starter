@@ -5,7 +5,11 @@ services:
   frontend:
     labels:
       shipyard.route: '/'
-    build: 'frontend'
+    build:
+      context: 'frontend'
+      args:
+        - foofoo
+        - foo=bar
     environment:
       CI: 'true'
       DANGEROUSLY_DISABLE_HOST_CHECK: 'true'
