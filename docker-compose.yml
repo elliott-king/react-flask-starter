@@ -36,9 +36,9 @@ services:
   psql-template-image:
     extends:
       service: base
-    # image: postgres:${PSQL_VERSION::2}-bullseye  # Invalid interpolation format for "image" option
+    image: postgres:${PSQL_VERSION::2}-bullseye  # Invalid interpolation format for "image" option
     environment:
-      # SHIPYARD_EPHEMERAL: true # services.psql-template-image.environment.SHIPYARD_EPHEMERAL contains true, which is an invalid type, it should be a string, number, or a null
+      SHIPYARD_EPHEMERAL: true # services.psql-template-image.environment.SHIPYARD_EPHEMERAL contains true, which is an invalid type, it should be a string, number, or a null
       CP_CONFIG_JVM_MAX_HEAP: 250M
       CP_CONFIG_ENV: development
       CP_CONFIG_PURPOSE: use1
