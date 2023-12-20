@@ -20,7 +20,9 @@ services:
   backend:
     labels:
       shipyard.route: '/api'
-    build: 'backend'
+    build:
+      context: backend
+      dockerfile: dockerfile
     environment:
       DATABASE_URL: 'postgres://obscure-user:obscure-password@postgres/app'
       DEV: ${DEV}
