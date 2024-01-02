@@ -48,6 +48,9 @@ services:
       - './backend/migrations:/srv/migrations'
       - './backend/src:/srv/src:ro'
 
+  rowboat:
+    image: 'gcr.io/shipyard-dev/rowboat:1.6.3'
+
   postgres:
     image: 'postgres:9.6-alpine'
     environment:
