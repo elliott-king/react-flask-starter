@@ -52,7 +52,7 @@ services:
   #   image: 'gcr.io/shipyard-dev/rowboat:1.6.3'
 
   postgres:
-    image: '776302443238.dkr.ecr.us-east-2.amazonaws.com/postgres'
+    image: 'postgres:9.6-alpine'
     environment:
       POSTGRES_USER: 'obscure-user'
       POSTGRES_PASSWORD: 'obscure-password'

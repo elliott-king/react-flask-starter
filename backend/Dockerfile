@@ -1,4 +1,4 @@
-FROM python:3.8.8-alpine3.13
+FROM 776302443238.dkr.ecr.us-east-2.amazonaws.com/alpine
 
 WORKDIR /srv
 
