@@ -42,7 +42,7 @@ services:
       DEV: ${DEV}
       FLASK_DEBUG: '1'
       LOCALSTACK_HOST: 'localstack'
-    command: '/entrypoints/worker.sh'
+    entrypoint: '/entrypoints/worker.sh'
     volumes:
       - './backend/filesystem/entrypoints:/entrypoints:ro'
       - './backend/migrations:/srv/migrations'
