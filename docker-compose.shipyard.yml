@@ -1,0 +1,143 @@
+# This docker-compose.yml is for local development. It sets up a reproducible
+# environment with all the dependencies. We might also use it for CI tests.
+#
+# Deployment environments will share the same web docker container but it
+# won't be deployed using this docker-compose.yml because the database etc.
+# will be set up elsewhere.
+services:
+  app:
+    labels:
+      shipyard.route: '/'
+    image: 'elliottking/doom-wasm:0.1.1'
+    ports:
+      - '8000:8000'
+    # labels:
+    #   shipyard.route: '/'
+    # restart: always
+    # build: .
+    # platform: linux/amd64
+    # networks:
+    #   - internal_network
+    #   - external_network
+    # ports:
+    #   - "3000:3000"
+    # command: bundle exec rails server
+    # env_file:
+    #   - .env
+    # environment:
+    #   - RAILS_ENV=production
+    #   - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    #   - BARNARD_DATABASE_URL=postgresql://postgres:password@db:5432/ch_barnard_development
+  db:
+    restart: always
+    image: postgres:13-alpine
+    networks:
+      - internal_network
+      - external_network
+    ports:
+      - "5443:5432"
+    command: -p 5432
+    # How to check if it's g2g
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    volumes:
+      # Create a persisted volume for psql data
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      # Set a default password, which you'll find also in config/database.yml
+      # for development
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis:alpine
+    command: redis-server
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - "6379:6379"
+    volumes:
+      - /tmp/db:/var/lib/redis/data
+
+  datadog:
+    image: datadog/agent:latest
+    profiles: ["datadog"]
+    networks:
+      - external_network
+      - internal_network
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+    ports:
+      - "8126:8126"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+  calcom:
+    image: calcom/cal.com
+    profiles: ["calcom"]
+    platform: linux/amd64
+    environment:
+      NEXT_PUBLIC_WEBAPP_URL: http://localhost:3000
+      NEXTAUTH_SECRET: V6O1q0BlcXd3Ko36C3REzuBCQsw6yfVKZdYvuuI80NU # dev secret
+      CALENDSO_ENCRYPTION_KEY: W+LcN6eMixBMmexA9BeM3P2Y2NnQpsq4 # dev secret
+      DATABASE_URL: postgresql://postgres:password@db/calendso
+      CALCOM_LICENSE_KEY: ${CALCOM_LICENSE_KEY}
+    networks:
+      - internal_network
+      - external_network
+    ports:
+      - 8000:3000
+    depends_on:
+      - db
+
+  # talk-file-service:
+  #   build: git@github.com:talkiatry/redox-service.git
+  #   tty: true
+  #   stdin_open: true
+  #   environment:
+  #     GH_TOKEN: ${GH_TOKEN}
+  #     NODE_ENV: docker
+  #     MAX_RETRY_ATTEMPTS: 5
+  #     RETRY_INTERVAL: 10
+  #     JOB_CONCURRENCY: 1
+  #     JOB_CONCURRENCY_INTERVAL: 1000
+  #     BUNDLE_PATH: /usr/local/bundle/vendor
+  #     DISABLE_REDACTOR: 'true'
+  #     USE_SECRET_MANAGER: 'true'
+  #   volumes:
+  #     - ./:/app
+  #     - ~/.aws:/root/.aws
+  #   ports:
+  #     - "3030:3030"
+  #     - "9229:9229"
+  #   networks:
+  #     - external_network
+  #     - internal_network
+  #   links:
+  #     - redis
+  #     - rabbitmq
+  #     - db
+
+networks:
+  external_network:
+  internal_network:
+    internal: true
+
+volumes:
+  postgres-data:

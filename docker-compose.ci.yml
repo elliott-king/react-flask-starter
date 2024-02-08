@@ -1,0 +1,80 @@
+# This docker-compose.yml is for local development. It sets up a reproducible
+# environment with all the dependencies. We might also use it for CI tests.
+#
+# Deployment environments will share the same web docker container but it
+# won't be deployed using this docker-compose.yml because the database etc.
+# will be set up elsewhere.
+version: "3.9"
+services:
+  db:
+    restart: always
+    image: postgres:13-alpine
+    # Only internal
+    networks:
+      - internal_network
+    # How to check if it's g2g
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    volumes:
+      # Create a persisted volume for psql data
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      # Set a default password, which you'll find also in config/database.yml
+      # for development
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - "6379:6379"
+    volumes:
+      - /tmp/db:/var/lib/redis/data
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec ddtracerb exec rails s -p 3000 -b '0.0.0.0'"
+    networks:
+      - external_network
+      - internal_network
+    # TODO: Healthcheck
+    volumes:
+      # For dev purposes, bind irb history
+      - $HOME/.irb_history:/root/.irb_history
+      # For dev purposes, bind local folder so changes are reflected. This
+      # overrides whatever was added in the image by the Dockerfile.
+      - .:/app
+    ports:
+      - "127.0.0.1:3000:3000"
+    # For dev purposes we want to be able to use byebug
+    #  or other tools of debugging (using a breakpoint)
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db
+    environment:
+      DATABASE_DOCKER_HOST: db
+
+  worker:
+    build: .
+    command: bundle exec sidekiq
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    environment:
+      REDIS_URL: redis://redis:6379/0
+
+networks:
+  external_network:
+  internal_network:
+    internal: true
+
+volumes:
+  postgres-data:
