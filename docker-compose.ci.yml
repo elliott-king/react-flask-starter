@@ -35,41 +35,47 @@ services:
       - /tmp/db:/var/lib/redis/data
 
   web:
-    build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec ddtracerb exec rails s -p 3000 -b '0.0.0.0'"
-    networks:
-      - external_network
-      - internal_network
-    # TODO: Healthcheck
-    volumes:
-      # For dev purposes, bind irb history
-      - $HOME/.irb_history:/root/.irb_history
-      # For dev purposes, bind local folder so changes are reflected. This
-      # overrides whatever was added in the image by the Dockerfile.
-      - .:/app
+    image: 'elliottking/doom-wasm:0.1.1'
     ports:
-      - "127.0.0.1:3000:3000"
-    # For dev purposes we want to be able to use byebug
-    #  or other tools of debugging (using a breakpoint)
-    stdin_open: true
-    tty: true
-    depends_on:
-      - db
-    environment:
-      DATABASE_DOCKER_HOST: db
+      - '8000:8000'
+    # build: .
+    # command: bash -c "rm -f tmp/pids/server.pid && bundle exec ddtracerb exec rails s -p 3000 -b '0.0.0.0'"
+    # networks:
+    #   - external_network
+    #   - internal_network
+    # # TODO: Healthcheck
+    # volumes:
+    #   # For dev purposes, bind irb history
+    #   - $HOME/.irb_history:/root/.irb_history
+    #   # For dev purposes, bind local folder so changes are reflected. This
+    #   # overrides whatever was added in the image by the Dockerfile.
+    #   - .:/app
+    # ports:
+    #   - "127.0.0.1:3000:3000"
+    # # For dev purposes we want to be able to use byebug
+    # #  or other tools of debugging (using a breakpoint)
+    # stdin_open: true
+    # tty: true
+    # depends_on:
+    #   - db
+    # environment:
+    #   DATABASE_DOCKER_HOST: db
 
   worker:
-    build: .
-    command: bundle exec sidekiq
-    networks:
-      - external_network
-      - internal_network
-    volumes:
-      - .:/app
-    depends_on:
-      - redis
-    environment:
-      REDIS_URL: redis://redis:6379/0
+    image: 'elliottking/doom-wasm:0.1.1'
+    ports:
+      - '8000:8000'
+    # build: .
+    # command: bundle exec sidekiq
+    # networks:
+    #   - external_network
+    #   - internal_network
+    # volumes:
+    #   - .:/app
+    # depends_on:
+    #   - redis
+    # environment:
+    #   REDIS_URL: redis://redis:6379/0
 
 networks:
   external_network:
