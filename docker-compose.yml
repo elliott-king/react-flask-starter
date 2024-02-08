@@ -17,6 +17,11 @@ services:
     ports:
       - '3000:3000'
 
+  silent-web:
+    build: '.'
+    depends_on:
+      - web
+
   backend:
     labels:
       shipyard.route: '/api'
