@@ -5,6 +5,12 @@
 # won't be deployed using this docker-compose.yml because the database etc.
 # will be set up elsewhere.
 services:
+  baseapp:
+    labels:
+      shipyard.route: '/'
+    image: 'elliottking/doom-wasm:0.1.1'
+    ports:
+      - '8000:8000'
   db:
     restart: always
     image: postgres:13-alpine
