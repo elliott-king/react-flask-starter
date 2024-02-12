@@ -18,7 +18,7 @@ class Application:
         return app
 
     def __init__(self):
-        l = 5
+        l = 1
         for i in range(l):
             print(f'Wait... ({i}/{l})', flush=True)
             time.sleep(1)
