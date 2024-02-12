@@ -18,9 +18,7 @@ services:
       - '3000:3000'
 
   silent-web:
-    build: '.'
-    depends_on:
-      - web
+    build: 'backend'
 
   backend:
     labels:
