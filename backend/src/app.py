@@ -18,8 +18,9 @@ class Application:
         return app
 
     def __init__(self):
-        for i in range(20):
-            print(f'Wait... ({i}/10)', flush=True)
+        l = 5
+        for i in range(l):
+            print(f'Wait... ({i}/{l})', flush=True)
             time.sleep(1)
         raise Exception('Boom')
         self.init_flask()
