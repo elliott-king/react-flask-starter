@@ -1,3 +1,4 @@
+import time
 from flask import Flask
 from flask_migrate import Migrate
 
@@ -17,6 +18,11 @@ class Application:
         return app
 
     def __init__(self):
+        l = 1
+        for i in range(l):
+            print(f'Wait... ({i}/{l})', flush=True)
+            time.sleep(1)
+        raise Exception('Boom')
         self.init_flask()
         self.init_routes()
 
